@@ -50,9 +50,10 @@ Files of interest
 
 Notes
 - Uses Spring Data JPA. Default `spring.jpa.hibernate.ddl-auto=update` is set for development.
-- To publish: add `LICENSE` and optionally OpenAPI/Swagger.
+
 
 Contribute
+
 - Fork → branch → PR. Open issues for feature requests or bugs.
 
 
