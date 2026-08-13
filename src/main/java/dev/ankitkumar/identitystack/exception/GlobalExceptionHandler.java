@@ -8,6 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Set;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -46,6 +48,50 @@ public class GlobalExceptionHandler {
         }
 
         return ResponseEntity.status(responseDto.getStatus()).body(responseDto);
+    }
+
+
+    @ExceptionHandler(ParameterNotFoundException.class)
+    public ResponseEntity<ExceptionResponseDto> handleParameterNotFoundException(ParameterNotFoundException exception) {
+
+
+        StringBuilder sBuilder = new StringBuilder(exception.getMessage());
+        Set<String> whiteableParameters = exception.getAllowedParameters();
+
+        ExceptionResponseDto responseDto = new ExceptionResponseDto();
+        responseDto.setStatus(HttpStatus.CONFLICT);
+        String message = exception.getMessage();
+        
+        
+        if(!whiteableParameters.isEmpty()){
+            
+            sBuilder.append(" Supported fields : ");
+          //  for (String field : whiteableParameters) sBuilder.append(field).append(" ");
+            sBuilder.append(whiteableParameters);
+            
+        }
+
+        responseDto.getMessage().add(sBuilder.toString());
+
+
+        
+
+        return ResponseEntity.status(responseDto.getStatus()).body(responseDto);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ExceptionResponseDto> handleGeneralException(RuntimeException exception){
+        ExceptionResponseDto responseDto = new ExceptionResponseDto();
+
+
+        String message = exception.getMessage();
+        System.out.println(message);
+
+        responseDto.getMessage().add("Something went wrong. Please try after some time.");
+        responseDto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        return ResponseEntity.status(responseDto.getStatus()).body(responseDto);
+
     }
 
 

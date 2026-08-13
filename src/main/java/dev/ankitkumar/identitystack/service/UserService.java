@@ -5,6 +5,7 @@ import dev.ankitkumar.identitystack.dto.response.ListUserResponseDto;
 import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
 import dev.ankitkumar.identitystack.entity.User;
 import dev.ankitkumar.identitystack.exception.ConflictException;
+import dev.ankitkumar.identitystack.exception.ParameterNotFoundException;
 import dev.ankitkumar.identitystack.exception.ResourceNotFoundException;
 import dev.ankitkumar.identitystack.mapper.UserMapper;
 import dev.ankitkumar.identitystack.repository.UserRepository;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -25,6 +27,8 @@ public class UserService {
 
     private UserMapper userMapper;
     private UserRepository userRepository;
+    private final Set<String> whiteListField = Set.of("firstName","lastName","phone","email");
+
 
     @Transactional
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
@@ -41,19 +45,29 @@ public class UserService {
         return userMapper
                 .toUserResponseDto(userResponse, HttpStatus.CREATED, "User registered successfully.");
     }
-    public ListUserResponseDto findAllUsers(String search, String sortedBy,String dir, int page, int pageSize) {
+    public ListUserResponseDto findAllUsers(String search,String sortedBy,String dir, int page, int pageSize) {
 
         List<User> userList;
         Sort sort = Sort.unsorted();
         System.out.println("Direction : " +dir) ;
 
-        if (sortedBy != null && !sortedBy.isBlank()) {
+
+
+        boolean isValid = isSortedParameterValid(sortedBy);
+        System.out.println(sortedBy + " : " + (isValid ? "valid" : "not valid"));
+        if(!isValid) throw new ParameterNotFoundException("Sorting with parameter "+ sortedBy +" is not supported.",whiteListField);
+
+        if(pageSize < 0) throw new ConflictException("Page size can't be less than 0. ");
+
+
+        if (!sortedBy.isBlank()) {
 
             if(dir == null ||  dir.isBlank() || dir.equals("asc")){
                 sort = Sort.by(Sort.Direction.ASC, sortedBy);
             } else if(dir.equals("desc")){
                 sort = Sort.by(Sort.Direction.DESC,sortedBy);
             }
+
         }
 
 
@@ -75,6 +89,18 @@ public class UserService {
 
         return userMapper.toListUserResponseDto(userList, message, HttpStatus.OK);
     }
+
+    private boolean isSortedParameterValid(String sortedBy) {
+
+        System.out.println("Called for : "+sortedBy);
+
+        if(sortedBy == null) return  true;
+        if (sortedBy.isBlank()) return true;
+
+
+        return whiteListField.contains(sortedBy);
+    }
+
     public UserResponseDto findUserById(Long id) {
 
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No User found with id " + id));

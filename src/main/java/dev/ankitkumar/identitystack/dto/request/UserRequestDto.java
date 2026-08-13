@@ -4,7 +4,6 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.UniqueElements;
 
 @NoArgsConstructor
 @Setter
@@ -23,7 +22,8 @@ public class UserRequestDto {
     private String lastName;
 
 
-    @Pattern(regexp = "[0-9]{10}$",message = "Please enter a valid phone number.")
+    @Pattern(regexp = "[0-9]{10}$",
+             message = "Please enter a valid phone number.")
     private String phone;
 
     @Email(message = "Please enter a valid email.")
