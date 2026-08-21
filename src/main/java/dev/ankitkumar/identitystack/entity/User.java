@@ -25,6 +25,7 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
 
+
     @Column(length = 10, unique = true)
     private String phone;
 
@@ -38,5 +39,9 @@ public class User {
     private final LocalDateTime createdAt = LocalDateTime.now();
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+
+    private String password;
+    private String username;
 
 }

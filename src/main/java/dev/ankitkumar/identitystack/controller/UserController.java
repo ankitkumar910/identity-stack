@@ -1,6 +1,6 @@
 package dev.ankitkumar.identitystack.controller;
 
-import dev.ankitkumar.identitystack.dto.request.UserRequestDto;
+import dev.ankitkumar.identitystack.dto.request.UserRegisterRequestDto;
 import dev.ankitkumar.identitystack.dto.response.ListUserResponseDto;
 import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
 import dev.ankitkumar.identitystack.service.UserService;
@@ -18,7 +18,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("")
-    private ResponseEntity<UserResponseDto> createUser(@RequestBody @Valid UserRequestDto userRequestDto) {
+    private ResponseEntity<UserResponseDto> createUser(@RequestBody @Valid UserRegisterRequestDto userRequestDto) {
 
         UserResponseDto userResponseDto = userService.createUser(userRequestDto);
 
@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    private ResponseEntity<UserResponseDto> updateUser(@RequestBody UserRequestDto requestDto, @PathVariable Long id) {
+    private ResponseEntity<UserResponseDto> updateUser(@RequestBody UserRegisterRequestDto requestDto, @PathVariable Long id) {
 
         UserResponseDto userResponseDto = userService.updateUser(requestDto, id);
 

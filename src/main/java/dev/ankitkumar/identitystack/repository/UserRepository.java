@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User,Long> {
@@ -21,4 +22,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
     boolean existsByEmail(@Email(message = "Please enter a valid email.") String email);
 
     boolean existsByPhone(@Pattern(regexp = "[0-9]{10}$",message = "Please enter a valid phone number.") String phone);
+
+    Optional<User> findByUsername(String username);
 }

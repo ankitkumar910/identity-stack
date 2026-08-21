@@ -1,26 +1,34 @@
 package dev.ankitkumar.identitystack.mapper;
 
-import dev.ankitkumar.identitystack.dto.request.UserRequestDto;
+import dev.ankitkumar.identitystack.dto.request.UserRegisterRequestDto;
+
 import dev.ankitkumar.identitystack.dto.response.ListUserResponseDto;
 import dev.ankitkumar.identitystack.dto.response.UserData;
 import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
 import dev.ankitkumar.identitystack.entity.User;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@AllArgsConstructor
 public class UserMapper {
 
-    public User toUser(UserRequestDto requestDto){
+    private PasswordEncoder passwordEncoder;
+
+    public User toUser(UserRegisterRequestDto requestDto){
         User user = new User();
         user.setFirstName(requestDto.getFirstName());
         user.setLastName(requestDto.getLastName());
         user.setEmail(requestDto.getEmail());
         user.setProfilePicture(requestDto.getProfilePicture());
         user.setPhone(requestDto.getPhone());
+        user.setUsername(requestDto.getUsername());
+        user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
 
         return user;
     }

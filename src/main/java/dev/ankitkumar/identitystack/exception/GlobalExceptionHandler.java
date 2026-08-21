@@ -79,16 +79,44 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(responseDto.getStatus()).body(responseDto);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ExceptionResponseDto> handleGeneralException(RuntimeException exception){
+
+    @ExceptionHandler(InvalidCredentialException.class)
+    public ResponseEntity<ExceptionResponseDto> handleInvalidCredentialsException(InvalidCredentialException exception){
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
 
 
         String message = exception.getMessage();
-        System.out.println(message);
+        System.out.println("ExceptionHandler\\handleInvalidCredentialsException: "+exception.getMessage());
 
+        responseDto.getMessage().add(exception.getMessage());
+        responseDto.setStatus(HttpStatus.UNAUTHORIZED);
+
+        return ResponseEntity.status(responseDto.getStatus()).body(responseDto);
+
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ExceptionResponseDto> handleGeneralException(RuntimeException exception){
+
+        ExceptionResponseDto responseDto = new ExceptionResponseDto();
+        System.out.println("ExceptionHandler\\handleGeneralException: "+exception.getMessage());
         responseDto.getMessage().add("Something went wrong. Please try after some time.");
         responseDto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        return ResponseEntity.status(responseDto.getStatus()).body(responseDto);
+
+    }
+
+    @ExceptionHandler(JwtTokenException.class)
+    public ResponseEntity<ExceptionResponseDto> handleJwtException(JwtTokenException exception){
+        ExceptionResponseDto responseDto = new ExceptionResponseDto();
+
+
+
+        System.out.println("ExceptionHandler\\handleJwtException: "+exception.getMessage());
+
+        responseDto.getMessage().add(exception.getMessage());
+        responseDto.setStatus(HttpStatus.BAD_REQUEST);
 
         return ResponseEntity.status(responseDto.getStatus()).body(responseDto);
 

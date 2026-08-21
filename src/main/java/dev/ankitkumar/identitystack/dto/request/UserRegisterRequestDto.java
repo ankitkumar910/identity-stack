@@ -8,7 +8,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class UserRequestDto {
+public class UserRegisterRequestDto {
 
     @NotBlank(message = "first name is required.")
     @NotNull(message = "first name can not be null.")
@@ -29,6 +29,36 @@ public class UserRequestDto {
     @Email(message = "Please enter a valid email.")
     @NotNull(message = "Email is required.")
     private String email;
+
+    @NotBlank(message = "Username is required.")
+    @Pattern(
+            regexp = "^[a-zA-Z0-9_]{3,16}$",
+            message = "Username must be 3–16 characters long and contain only letters, numbers, or underscores."
+    )
+    private String username;
+
+    @NotBlank(message = "Password is required.")
+    @Pattern(
+            regexp = ".*[a-z].*",
+            message = "Password must contain at least one lowercase letter."
+    )
+    @Pattern(
+            regexp = ".*[A-Z].*",
+            message = "Password must contain at least one uppercase letter."
+    )
+    @Pattern(
+            regexp = ".*\\d.*",
+            message = "Password must contain at least one digit."
+    )
+    @Pattern(
+            regexp = ".*[@$!%*?&].*",
+            message = "Password must contain at least one special character (@, $, !, %, *, ?, or &) ."
+    )
+    @Size(
+            min = 8,
+            message = "Password must be at least 8 characters long."
+    )
+    private String password;
 
     private String profilePicture;
 }
