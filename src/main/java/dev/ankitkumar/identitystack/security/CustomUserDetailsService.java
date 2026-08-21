@@ -1,7 +1,6 @@
 package dev.ankitkumar.identitystack.security;
 
 import dev.ankitkumar.identitystack.entity.User;
-import dev.ankitkumar.identitystack.exception.InvalidCredentialException;
 import dev.ankitkumar.identitystack.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;

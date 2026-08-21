@@ -1,7 +1,6 @@
 package dev.ankitkumar.identitystack.exception;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class InvalidCredentialException extends RuntimeException {

@@ -60,13 +60,12 @@ public class GlobalExceptionHandler {
 
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
         responseDto.setStatus(HttpStatus.CONFLICT);
-        String message = exception.getMessage();
-        
+
         
         if(!whiteableParameters.isEmpty()){
             
             sBuilder.append(" Supported fields : ");
-          //  for (String field : whiteableParameters) sBuilder.append(field).append(" ");
+
             sBuilder.append(whiteableParameters);
             
         }
@@ -85,7 +84,7 @@ public class GlobalExceptionHandler {
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
 
 
-        String message = exception.getMessage();
+
         System.out.println("ExceptionHandler\\handleInvalidCredentialsException: "+exception.getMessage());
 
         responseDto.getMessage().add(exception.getMessage());

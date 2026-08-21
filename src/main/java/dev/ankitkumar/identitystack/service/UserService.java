@@ -51,12 +51,12 @@ public class UserService {
 
         List<User> userList;
         Sort sort = Sort.unsorted();
-        //  System.out.println("Direction : " + dir);
+
 
 
         boolean isValid = isSortedParameterValid(sortedBy);
 
-        //   System.out.println(sortedBy + " : " + (isValid ? "valid" : "not valid"));
+
         if (!isValid)
             throw new ParameterNotFoundException("Sorting with parameter " + sortedBy + " is not supported.", whiteListField);
 
