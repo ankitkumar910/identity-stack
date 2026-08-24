@@ -5,7 +5,6 @@ import dev.ankitkumar.identitystack.dto.response.ListUserResponseDto;
 import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
 import dev.ankitkumar.identitystack.entity.User;
 import dev.ankitkumar.identitystack.exception.ConflictException;
-import dev.ankitkumar.identitystack.exception.JwtTokenException;
 import dev.ankitkumar.identitystack.exception.ParameterNotFoundException;
 import dev.ankitkumar.identitystack.exception.ResourceNotFoundException;
 import dev.ankitkumar.identitystack.mapper.UserMapper;
@@ -16,13 +15,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -46,15 +43,13 @@ public class UserService {
         User user = userMapper.toUser(userRequestDto);
         User userResponse = userRepository.save(user);
 
-        return userMapper
-                .toUserResponseDto(userResponse, HttpStatus.CREATED, "User registered successfully.");
+        return userMapper.toUserResponseDto(userResponse, HttpStatus.CREATED, "User registered successfully.");
     }
 
     public ListUserResponseDto findAllUsers(String search, String sortedBy, String dir, int page, int pageSize) {
 
         List<User> userList;
         Sort sort = Sort.unsorted();
-
 
 
         boolean isValid = isSortedParameterValid(sortedBy);
@@ -119,37 +114,47 @@ public class UserService {
         boolean updated = false;
 
 
-        if (requestDto.getFirstName() != null && !requestDto.getFirstName().isBlank()) {
+        if (shouldUpdateField(user.getFirstName(), requestDto.getFirstName())) {
             user.setFirstName(requestDto.getFirstName());
             updated = true;
         }
 
-        if (requestDto.getLastName() != null && !requestDto.getLastName().isBlank()) {
+        if (shouldUpdateField(user.getLastName(), requestDto.getLastName())) {
             user.setLastName(requestDto.getLastName());
             updated = true;
         }
 
-        if (requestDto.getEmail() != null && !requestDto.getEmail().isBlank()) {
+        if (shouldUpdateField(user.getEmail(), requestDto.getEmail())) {
+
+            if (userRepository.existsByEmail(requestDto.getEmail()))
+                throw new ConflictException("Email already present.");
             user.setEmail(requestDto.getEmail());
             updated = true;
         }
 
-        if (requestDto.getPhone() != null && !requestDto.getPhone().isBlank()) {
+        if (shouldUpdateField(user.getPhone(), requestDto.getPhone())) {
             user.setPhone(requestDto.getPhone());
             updated = true;
         }
 
-        if (requestDto.getProfilePicture() != null && !requestDto.getProfilePicture().isBlank()) {
+        if (shouldUpdateField(user.getProfilePicture(), requestDto.getProfilePicture())) {
             user.setProfilePicture(requestDto.getProfilePicture());
             updated = true;
 
         }
 
-        if (updated) {
-            user.setUpdatedAt(LocalDateTime.now());
+        if (shouldUpdateField(user.getUsername(), requestDto.getUsername())) {
+
+            if (!userRepository.existsByUsername(requestDto.getUsername())) user.setUsername(requestDto.getUsername());
+            else throw new ConflictException("Username already taken.");
+
         }
 
-        userRepository.save(user);
+        if (updated) {
+            user.setUpdatedAt(LocalDateTime.now());
+            userRepository.save(user);
+
+        }
 
         return userMapper.toUserResponseDto(user, HttpStatus.OK, "User updated successfully.");
     }
@@ -167,10 +172,16 @@ public class UserService {
 
     public UserResponseDto findUserByUsername(String username) {
 
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new ResourceNotFoundException("User not found."));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
-        return userMapper.toUserResponseDto(user,HttpStatus.OK,"Success");
+        return userMapper.toUserResponseDto(user, HttpStatus.OK, "Success");
 
+    }
+
+
+    boolean shouldUpdateField(String prevValue, String newValue) {
+
+        return newValue != null && !newValue.isBlank() && !newValue.equals(prevValue);
     }
 
 
