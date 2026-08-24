@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -28,19 +26,34 @@ public class JwtService {
     private String issuer;
 
     public String getToken(CustomUserDetails userDetails){
+        System.out.println("Username " + userDetails.getUsername());
+
+
+       List<String> authorityList =  userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority).toList();
+
+        System.out.println("Role: " + authorityList);
+
+        long id = userDetails.getId();
 
       return   Jwts.builder()
                 .signWith(key)
+                .claim("user_id",id)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + duration))
                 .issuer(issuer)
                 .subject(userDetails.getUsername())
-                .claim("role","USER")
+                .claim("roles",authorityList)
                 .compact();
     }
 
     public String extractUsername(String jwtToken) {
         return claims(jwtToken).getSubject();
+    }
+
+    public long extractId(String jwtToken){
+        return Long.parseLong(claims(jwtToken).get("user_id").toString());
     }
 
     private Claims claims(String token){
@@ -62,11 +75,10 @@ public class JwtService {
 
     }
 
-    public @Nullable Collection<GrantedAuthority> extractAuthorities(String jwtToken) {
-        String role = claims(jwtToken).get("role",String.class);
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(role));
+    public @Nullable List<SimpleGrantedAuthority> extractAuthorities(String jwtToken) {
+        List<String> authoritiesList =  claims(jwtToken).get("roles",List.class);
+        System.out.println("Authenticated! Role: "+authoritiesList);
 
-        return authorities;
+        return authoritiesList.stream().map(SimpleGrantedAuthority::new).toList();
     }
 }

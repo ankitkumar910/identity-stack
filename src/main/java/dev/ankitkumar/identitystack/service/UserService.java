@@ -5,6 +5,7 @@ import dev.ankitkumar.identitystack.dto.response.ListUserResponseDto;
 import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
 import dev.ankitkumar.identitystack.entity.User;
 import dev.ankitkumar.identitystack.exception.ConflictException;
+import dev.ankitkumar.identitystack.exception.JwtTokenException;
 import dev.ankitkumar.identitystack.exception.ParameterNotFoundException;
 import dev.ankitkumar.identitystack.exception.ResourceNotFoundException;
 import dev.ankitkumar.identitystack.mapper.UserMapper;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -155,16 +158,20 @@ public class UserService {
     public void removeUserById(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
+            SecurityContextHolder.getContext().setAuthentication(null);
         } else {
             throw new ResourceNotFoundException("No user found with id " + id);
         }
 
     }
 
-    public Optional<User> findUserByUsername(String username) {
+    public UserResponseDto findUserByUsername(String username) {
 
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new ResourceNotFoundException("User not found."));
 
-        return userRepository.findByUsername(username);
+        return userMapper.toUserResponseDto(user,HttpStatus.OK,"Success");
 
     }
+
+
 }

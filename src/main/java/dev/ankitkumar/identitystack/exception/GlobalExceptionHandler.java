@@ -100,6 +100,7 @@ public class GlobalExceptionHandler {
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
         System.out.println("ExceptionHandler\\handleGeneralException: "+exception.getMessage());
         responseDto.getMessage().add("Something went wrong. Please try after some time.");
+        exception.printStackTrace();
         responseDto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
 
         return ResponseEntity.status(responseDto.getStatus()).body(responseDto);

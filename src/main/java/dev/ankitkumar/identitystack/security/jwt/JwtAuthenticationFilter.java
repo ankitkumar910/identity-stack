@@ -1,5 +1,7 @@
 package dev.ankitkumar.identitystack.security.jwt;
 
+import dev.ankitkumar.identitystack.security.CustomUserDetails;
+import dev.ankitkumar.identitystack.security.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +20,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private JwtService jwtService;
+    private CustomUserDetailsService customUserDetailsService;
 
 
     @Override
@@ -42,8 +45,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
 
             String username = jwtService.extractUsername(jwtToken);
+            System.out.println("User id : " + jwtService.extractId(jwtToken));
+            long user_id = jwtService.extractId(jwtToken);
 
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, jwtService.extractAuthorities(jwtToken));
+
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(customUserDetailsService.loadUserByUserId(user_id), null, jwtService.extractAuthorities(jwtToken));
 
             if (authentication.isAuthenticated()) {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -60,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getWriter().write(message);
 
-            System.out.println(e.getMessage());
+            System.out.println("Exception in JwtFilterChain: "+e.getMessage());
             return;
         }
 

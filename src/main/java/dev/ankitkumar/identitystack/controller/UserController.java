@@ -1,13 +1,16 @@
 package dev.ankitkumar.identitystack.controller;
 
 import dev.ankitkumar.identitystack.dto.request.UserRegisterRequestDto;
-import dev.ankitkumar.identitystack.dto.response.ListUserResponseDto;
 import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
+import dev.ankitkumar.identitystack.exception.JwtTokenException;
+import dev.ankitkumar.identitystack.security.CustomUserDetails;
 import dev.ankitkumar.identitystack.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +20,7 @@ public class UserController {
 
     private UserService userService;
 
+
     @PostMapping("")
     private ResponseEntity<UserResponseDto> createUser(@RequestBody @Valid UserRegisterRequestDto userRequestDto) {
 
@@ -25,41 +29,59 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
     }
 
-    @GetMapping("")
-    private ResponseEntity<ListUserResponseDto> findUser(@RequestParam(name = "search", required = false) String search
-            , @RequestParam(name = "sort", required = false) String sortedBy,
-                                                         @RequestParam(name = "dir", required = false, defaultValue = "asc") String dir,
-                                                         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                         @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize
-    ) {
-
-
-        ListUserResponseDto userResponseDto = userService.findAllUsers(search, sortedBy,dir, page, pageSize);
-
-        return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
-    }
-
-    @GetMapping("/{id}")
-    private ResponseEntity<UserResponseDto> findUserById(@PathVariable Long id) {
-        UserResponseDto userResponseDto = userService.findUserById(id);
-
+    @GetMapping("/me")
+    private ResponseEntity<UserResponseDto> findMyProfile() {
+        String username = getUsername();
+        UserResponseDto userResponseDto = userService.findUserByUsername(username);
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
     }
 
-    @PatchMapping("/{id}")
-    private ResponseEntity<UserResponseDto> updateUser(@RequestBody UserRegisterRequestDto requestDto, @PathVariable Long id) {
+    @PatchMapping("/me")
+    private ResponseEntity<UserResponseDto> updateUser(@RequestBody UserRegisterRequestDto requestDto) {
 
-        UserResponseDto userResponseDto = userService.updateUser(requestDto, id);
+        //UserResponseDto userResponseDto = userService.updateUser(requestDto, id);
 
-        return ResponseEntity.ok(userResponseDto);
+        return ResponseEntity.ok(null);
     }
 
-    @DeleteMapping("/{id}")
-    private ResponseEntity.BodyBuilder deleteUser(@PathVariable Long id) {
+    @DeleteMapping("/me")
+    private ResponseEntity.BodyBuilder deleteUser() {
 
-        userService.removeUserById(id);
+
+        long user_id = getUserId();
+
+        userService.removeUserById(user_id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT);
+
     }
 
+
+    private String getUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()){
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+           if(customUserDetails != null) return customUserDetails.getUsername();
+        }
+
+        throw new JwtTokenException("Access token is compromised or expired.");
+    }
+
+    private long getUserId() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            System.out.println(authentication.getPrincipal());
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+            if (customUserDetails != null) {
+                System.out.println("Id in controller : " + customUserDetails.getId());
+                return customUserDetails.getId();
+
+            }
+        }
+
+        throw new JwtTokenException("Access token is compromised or expired.");
+    }
 
 }

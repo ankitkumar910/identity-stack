@@ -1,6 +1,7 @@
 package dev.ankitkumar.identitystack.security;
 
 import dev.ankitkumar.identitystack.entity.User;
+import dev.ankitkumar.identitystack.repository.UserRepository;
 import dev.ankitkumar.identitystack.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,14 +14,15 @@ import java.util.Optional;
 @AllArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    UserService userService;
+    private UserRepository userRepository;
+
 
     @Override
     public  CustomUserDetails loadUserByUsername(String username) {
 
 
 
-        Optional<User> userOptional = userService.findUserByUsername(username);
+        Optional<User> userOptional = userRepository.findByUsername(username);
 
         if(userOptional.isPresent()) {
             User user = userOptional.get();
@@ -28,6 +30,18 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         throw  new UsernameNotFoundException("User not found with username : "+username);
+    }
+
+    public Object loadUserByUserId(long userId) {
+
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if(userOptional.isPresent()) {
+            User user = userOptional.get();
+            return new CustomUserDetails(user);
+        }
+
+        throw  new UsernameNotFoundException("User not found.");
 
     }
 }

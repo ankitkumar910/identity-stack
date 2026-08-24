@@ -1,5 +1,6 @@
 package dev.ankitkumar.identitystack.repository;
 
+import dev.ankitkumar.identitystack.entity.Role;
 import dev.ankitkumar.identitystack.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
@@ -22,4 +23,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
     boolean existsByPhone(@Pattern(regexp = "[0-9]{10}$",message = "Please enter a valid phone number.") String phone);
 
     Optional<User> findByUsername(String username);
+    boolean existsByRoles(Role role);
+
+
 }

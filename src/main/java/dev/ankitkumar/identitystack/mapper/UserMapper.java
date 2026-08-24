@@ -5,12 +5,12 @@ import dev.ankitkumar.identitystack.dto.request.UserRegisterRequestDto;
 import dev.ankitkumar.identitystack.dto.response.ListUserResponseDto;
 import dev.ankitkumar.identitystack.dto.response.UserData;
 import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
+import dev.ankitkumar.identitystack.entity.Role;
 import dev.ankitkumar.identitystack.entity.User;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +29,7 @@ public class UserMapper {
         user.setPhone(requestDto.getPhone());
         user.setUsername(requestDto.getUsername());
         user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+        user.getRoles().add(Role.USER);
 
         return user;
     }
@@ -72,6 +73,7 @@ public class UserMapper {
         userData.setLastName(user.getLastName());
         userData.setProfilePicture(user.getProfilePicture());
         userData.setPhone(user.getPhone());
+
 
         return  userData;
     }

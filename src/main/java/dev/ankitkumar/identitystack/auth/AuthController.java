@@ -17,7 +17,7 @@ public class AuthController {
 
     private AuthService authService;
     @PostMapping("/login")
-    public ResponseEntity<UserLoginResponseDto> login(@RequestBody(required = true)  @Validated UserLoginRequestDto requestDto){
+    public String login(@RequestBody(required = true)  @Validated UserLoginRequestDto requestDto){
 
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
@@ -28,6 +28,6 @@ public class AuthController {
         UserLoginResponseDto responseDto = new UserLoginResponseDto();
         responseDto.setAccessToken(jwtToken);
 
-        return ResponseEntity.ok(responseDto);
+        return jwtToken;
     }
 }
