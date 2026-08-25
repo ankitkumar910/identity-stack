@@ -1,22 +1,27 @@
 package dev.ankitkumar.identitystack.service;
 
+import dev.ankitkumar.identitystack.dto.request.UserPasswordUpdate;
 import dev.ankitkumar.identitystack.dto.request.UserRegisterRequestDto;
 import dev.ankitkumar.identitystack.dto.request.UserUpdateRequestDto;
 import dev.ankitkumar.identitystack.dto.response.ListUserResponseDto;
+import dev.ankitkumar.identitystack.dto.response.UserPasswordUpdateResponse;
 import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
 import dev.ankitkumar.identitystack.entity.User;
+import dev.ankitkumar.identitystack.exception.BadCredentialsExceptions;
 import dev.ankitkumar.identitystack.exception.ConflictException;
 import dev.ankitkumar.identitystack.exception.ParameterNotFoundException;
 import dev.ankitkumar.identitystack.exception.ResourceNotFoundException;
 import dev.ankitkumar.identitystack.mapper.UserMapper;
 import dev.ankitkumar.identitystack.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,7 +35,7 @@ public class UserService {
     private UserMapper userMapper;
     private UserRepository userRepository;
     private final Set<String> whiteListField = Set.of("firstName", "lastName", "phone", "email");
-
+    private final PasswordEncoder encoder;
 
     @Transactional
     public UserResponseDto createUser(UserRegisterRequestDto userRequestDto) {
@@ -179,11 +184,24 @@ public class UserService {
 
     }
 
-
     boolean shouldUpdateField(String prevValue, String newValue) {
 
         return newValue != null && !newValue.isBlank() && !newValue.equals(prevValue);
     }
 
+    @Transactional
+    public UserPasswordUpdateResponse updateUserPassword(@Valid UserPasswordUpdate requestDto, long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
+        if(encoder.matches(requestDto.getOldPassword(), user.getPassword())){
+            user.setPassword(encoder.encode(requestDto.getNewPassword()));
+            UserPasswordUpdateResponse passwordUpdateResponse = new UserPasswordUpdateResponse();
+            passwordUpdateResponse.setMessage("Password updated.");
+            user.setUpdatedAt(LocalDateTime.now());
+            userRepository.save(user);
+            return passwordUpdateResponse;
+        }
+
+      throw new BadCredentialsExceptions("Password does not matched with older one.");
+    }
 }

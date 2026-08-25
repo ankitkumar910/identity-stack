@@ -1,7 +1,9 @@
 package dev.ankitkumar.identitystack.controller;
 
+import dev.ankitkumar.identitystack.dto.request.UserPasswordUpdate;
 import dev.ankitkumar.identitystack.dto.request.UserRegisterRequestDto;
 import dev.ankitkumar.identitystack.dto.request.UserUpdateRequestDto;
+import dev.ankitkumar.identitystack.dto.response.UserPasswordUpdateResponse;
 import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
 import dev.ankitkumar.identitystack.security.SecurityUtil;
 import dev.ankitkumar.identitystack.service.UserService;
@@ -40,6 +42,14 @@ public class UserController {
         long user_id = SecurityUtil.getUserId();
         return ResponseEntity.ok(userService.updateUser(requestDto, user_id));
     }
+
+    @PatchMapping("/me/password") //✅
+    private ResponseEntity<UserPasswordUpdateResponse> updateUser(@RequestBody @Valid UserPasswordUpdate requestDto) {
+
+        long user_id = SecurityUtil.getUserId();
+        return ResponseEntity.ok(userService.updateUserPassword(requestDto, user_id));
+    }
+
 
     @DeleteMapping("/me") //✅
     private ResponseEntity.BodyBuilder deleteUser() {

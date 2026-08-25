@@ -11,7 +11,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.nio.file.AccessDeniedException;
 import java.util.Set;
 
 @RestControllerAdvice
@@ -65,31 +64,28 @@ public class GlobalExceptionHandler {
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
         responseDto.setStatus(HttpStatus.CONFLICT);
 
-        
-        if(!whiteableParameters.isEmpty()){
-            
+
+        if (!whiteableParameters.isEmpty()) {
+
             sBuilder.append(" Supported fields : ");
 
             sBuilder.append(whiteableParameters);
-            
+
         }
 
         responseDto.getMessage().add(sBuilder.toString());
 
-
-        
 
         return ResponseEntity.status(responseDto.getStatus()).body(responseDto);
     }
 
 
     @ExceptionHandler(InvalidCredentialException.class)
-    public ResponseEntity<ExceptionResponseDto> handleInvalidCredentialsException(InvalidCredentialException exception){
+    public ResponseEntity<ExceptionResponseDto> handleInvalidCredentialsException(InvalidCredentialException exception) {
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
 
 
-
-        System.out.println("ExceptionHandler\\handleInvalidCredentialsException: "+exception.getMessage());
+        System.out.println("ExceptionHandler\\handleInvalidCredentialsException: " + exception.getMessage());
 
         responseDto.getMessage().add(exception.getMessage());
         responseDto.setStatus(HttpStatus.UNAUTHORIZED);
@@ -99,10 +95,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ExceptionResponseDto> handleGeneralException(RuntimeException exception){
+    public ResponseEntity<ExceptionResponseDto> handleGeneralException(RuntimeException exception) {
 
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
-        System.out.println("ExceptionHandler\\handleGeneralException: "+exception.getMessage());
+        System.out.println("ExceptionHandler\\handleGeneralException: " + exception.getMessage());
         responseDto.getMessage().add("Something went wrong. Please try after some time.");
         exception.printStackTrace();
         responseDto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -112,12 +108,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(JwtTokenException.class)
-    public ResponseEntity<ExceptionResponseDto> handleJwtException(JwtTokenException exception){
+    public ResponseEntity<ExceptionResponseDto> handleJwtException(JwtTokenException exception) {
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
 
 
-
-        System.out.println("ExceptionHandler\\handleJwtException: "+exception.getMessage());
+        System.out.println("ExceptionHandler\\handleJwtException: " + exception.getMessage());
 
         responseDto.getMessage().add(exception.getMessage());
         responseDto.setStatus(HttpStatus.BAD_REQUEST);
@@ -127,12 +122,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<ExceptionResponseDto> handleAccessDeniedException(AuthorizationDeniedException exception){
+    public ResponseEntity<ExceptionResponseDto> handleAccessDeniedException(AuthorizationDeniedException exception) {
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
 
 
-
-        System.out.println("ExceptionHandler\\handleAccessDeniedException: "+exception.getMessage());
+        System.out.println("ExceptionHandler\\handleAccessDeniedException: " + exception.getMessage());
 
         responseDto.getMessage().add(exception.getMessage());
         responseDto.setStatus(HttpStatus.FORBIDDEN);
@@ -164,6 +158,21 @@ public class GlobalExceptionHandler {
 
         response.getMessage().add("Provided data exceeds the allowed limit.");
         response.setStatus(HttpStatus.BAD_REQUEST);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
+
+    @ExceptionHandler(BadCredentialsExceptions.class)
+    public ResponseEntity<ExceptionResponseDto> handleBadCredentialsException(BadCredentialsExceptions badCredentialsExceptions) {
+
+        ExceptionResponseDto response = new ExceptionResponseDto();
+
+        response.getMessage().add("Provided old password is not valid.");
+        response.setStatus(HttpStatus.BAD_REQUEST);
+
+        System.out.println(badCredentialsExceptions.message);
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
