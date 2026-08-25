@@ -1,9 +1,11 @@
 package dev.ankitkumar.identitystack.controller;
 
 import dev.ankitkumar.identitystack.dto.request.UserRegisterRequestDto;
+import dev.ankitkumar.identitystack.dto.request.UserUpdateRequestDto;
 import dev.ankitkumar.identitystack.dto.response.ListUserResponseDto;
 import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
 import dev.ankitkumar.identitystack.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,14 +14,19 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/admin/users")
-@AllArgsConstructor
 public class AdminController {
 
-    private UserService userService;
+    private final UserService userService;
+
+    public AdminController(UserService userService) {
+        this.userService = userService;
+
+        System.out.println("AdminController initialized with UserService: " + userService);
+    }
 
     @GetMapping("")
     @PreAuthorize("hasRole('ADMIN')")
-    private ResponseEntity<ListUserResponseDto> findUser(@RequestParam(name = "search", required = false) String search
+    public ResponseEntity<ListUserResponseDto> findUser(@RequestParam(name = "search", required = false) String search
             , @RequestParam(name = "sort", required = false) String sortedBy,
                                                          @RequestParam(name = "dir", required = false, defaultValue = "asc") String dir,
                                                          @RequestParam(name = "page", required = false, defaultValue = "0") int page,
@@ -34,14 +41,16 @@ public class AdminController {
 
 
     @GetMapping("/{id}")
-    private ResponseEntity<UserResponseDto> findUserById(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserResponseDto> findUserById(@PathVariable Long id) {
         UserResponseDto userResponseDto = userService.findUserById(id);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
     }
 
     @PatchMapping("/{id}")
-    private ResponseEntity<UserResponseDto> updateUser(@RequestBody UserRegisterRequestDto requestDto, @PathVariable Long id) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserResponseDto> updateUser(@RequestBody @Valid UserUpdateRequestDto requestDto, @PathVariable Long id) {
 
         UserResponseDto userResponseDto = userService.updateUser(requestDto, id);
 
@@ -49,7 +58,8 @@ public class AdminController {
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity.BodyBuilder deleteUser(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity.BodyBuilder deleteUser(@PathVariable Long id) {
 
         userService.removeUserById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT);

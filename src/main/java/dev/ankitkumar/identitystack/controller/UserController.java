@@ -1,6 +1,7 @@
 package dev.ankitkumar.identitystack.controller;
 
 import dev.ankitkumar.identitystack.dto.request.UserRegisterRequestDto;
+import dev.ankitkumar.identitystack.dto.request.UserUpdateRequestDto;
 import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
 import dev.ankitkumar.identitystack.security.SecurityUtil;
 import dev.ankitkumar.identitystack.service.UserService;
@@ -30,16 +31,13 @@ public class UserController {
     private ResponseEntity<UserResponseDto> findMyProfile() {
         String username = SecurityUtil.getUsername();
         UserResponseDto userResponseDto = userService.findUserByUsername(username);
-        return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
     }
 
     @PatchMapping("/me") //✅
-    private ResponseEntity<UserResponseDto> updateUser(@RequestBody @Valid UserRegisterRequestDto requestDto) {
+    private ResponseEntity<UserResponseDto> updateUser(@RequestBody @Valid UserUpdateRequestDto requestDto) {
 
         long user_id = SecurityUtil.getUserId();
-
-        ;
-
         return ResponseEntity.ok(userService.updateUser(requestDto, user_id));
     }
 

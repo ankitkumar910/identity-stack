@@ -1,6 +1,7 @@
 package dev.ankitkumar.identitystack.service;
 
 import dev.ankitkumar.identitystack.dto.request.UserRegisterRequestDto;
+import dev.ankitkumar.identitystack.dto.request.UserUpdateRequestDto;
 import dev.ankitkumar.identitystack.dto.response.ListUserResponseDto;
 import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
 import dev.ankitkumar.identitystack.entity.User;
@@ -107,7 +108,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDto updateUser(UserRegisterRequestDto requestDto, Long id) {
+    public UserResponseDto updateUser(UserUpdateRequestDto requestDto, Long id) {
 
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No user found with id " + id));
 

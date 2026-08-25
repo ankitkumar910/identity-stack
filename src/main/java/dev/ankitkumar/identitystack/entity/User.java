@@ -35,7 +35,7 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    @Column(name = "profile_picture")
+    @Column(name = "profile_picture",length = 1000)
     private String profilePicture;
 
     @Column(name = "created_at")

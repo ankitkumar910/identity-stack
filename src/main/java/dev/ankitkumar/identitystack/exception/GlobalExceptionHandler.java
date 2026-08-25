@@ -1,13 +1,17 @@
 package dev.ankitkumar.identitystack.exception;
 
 import dev.ankitkumar.identitystack.dto.response.ExceptionResponseDto;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.AccessDeniedException;
 import java.util.Set;
 
 @RestControllerAdvice
@@ -120,6 +124,50 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(responseDto.getStatus()).body(responseDto);
 
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ExceptionResponseDto> handleAccessDeniedException(AuthorizationDeniedException exception){
+        ExceptionResponseDto responseDto = new ExceptionResponseDto();
+
+
+
+        System.out.println("ExceptionHandler\\handleAccessDeniedException: "+exception.getMessage());
+
+        responseDto.getMessage().add(exception.getMessage());
+        responseDto.setStatus(HttpStatus.FORBIDDEN);
+
+        return ResponseEntity.status(responseDto.getStatus()).body(responseDto);
+
+    }
+
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ExceptionResponseDto> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException exception) {
+
+        ExceptionResponseDto responseDto = new ExceptionResponseDto();
+
+        responseDto.getMessage().add("Request body is required.");
+        responseDto.setStatus(HttpStatus.BAD_REQUEST);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(responseDto);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ExceptionResponseDto> handleDataIntegrityViolation(
+            DataIntegrityViolationException exception) {
+
+        ExceptionResponseDto response = new ExceptionResponseDto();
+
+        response.getMessage().add("Provided data exceeds the allowed limit.");
+        response.setStatus(HttpStatus.BAD_REQUEST);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response);
     }
 
 
