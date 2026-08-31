@@ -4,8 +4,10 @@ import dev.ankitkumar.identitystack.dto.request.UserPasswordUpdate;
 import dev.ankitkumar.identitystack.dto.request.UserRegisterRequestDto;
 import dev.ankitkumar.identitystack.dto.request.UserUpdateRequestDto;
 import dev.ankitkumar.identitystack.dto.response.ListUserResponseDto;
+import dev.ankitkumar.identitystack.dto.response.RoleUpdateDto;
 import dev.ankitkumar.identitystack.dto.response.UserPasswordUpdateResponse;
 import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
+import dev.ankitkumar.identitystack.entity.Role;
 import dev.ankitkumar.identitystack.entity.User;
 import dev.ankitkumar.identitystack.exception.BadCredentialsExceptions;
 import dev.ankitkumar.identitystack.exception.ConflictException;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -193,7 +196,7 @@ public class UserService {
     public UserPasswordUpdateResponse updateUserPassword(@Valid UserPasswordUpdate requestDto, long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
-        if(encoder.matches(requestDto.getOldPassword(), user.getPassword())){
+        if (encoder.matches(requestDto.getOldPassword(), user.getPassword())) {
             user.setPassword(encoder.encode(requestDto.getNewPassword()));
             UserPasswordUpdateResponse passwordUpdateResponse = new UserPasswordUpdateResponse();
             passwordUpdateResponse.setMessage("Password updated.");
@@ -202,6 +205,28 @@ public class UserService {
             return passwordUpdateResponse;
         }
 
-      throw new BadCredentialsExceptions("Password does not matched with older one.");
+        throw new BadCredentialsExceptions("Password does not matched with older one.");
+    }
+
+    @Transactional
+    public RoleUpdateDto updateRole(Long id, boolean demotion) {
+
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id : " + id));
+
+        Set<Role> roles = user.getRoles();
+        System.out.println("ROLES : " + roles);
+
+        if (demotion) {
+            if (roles.contains(Role.ADMIN)) {
+                if(id.equals(user.getId()))
+                roles.remove(Role.ADMIN);
+                else throw new AuthorizationDeniedException("You are not allowed to change your own role.");
+            } else {
+                throw new RuntimeException("Admin not found.");
+            }
+        } else {
+            roles.add(Role.ADMIN);
+        }
+     return new RoleUpdateDto("Role updated successfully.");
     }
 }

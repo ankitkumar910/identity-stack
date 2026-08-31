@@ -26,15 +26,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+
         String authenticationToken = request.getHeader("authorization");
 
 
+
         if (authenticationToken == null || !authenticationToken.startsWith("Bearer ")) {
+            //System.out.println("Authentication token not found.");
             filterChain.doFilter(request, response);
+           // System.out.println("Returned.");
+
             return;
         }
 
         String jwtToken = authenticationToken.substring(7);
+        System.out.println("Jwt found.");
 
         if (jwtToken.isBlank()) {
             filterChain.doFilter(request, response);
@@ -44,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
 
-            String username = jwtService.extractUsername(jwtToken);
+
             System.out.println("User id : " + jwtService.extractId(jwtToken));
             long user_id = jwtService.extractId(jwtToken);
 
@@ -71,6 +77,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        System.out.println("Run till here.");
         filterChain.doFilter(request, response);
 
     }
