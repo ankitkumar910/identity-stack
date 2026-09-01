@@ -48,11 +48,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
 
+
         try {
 
 
             System.out.println("User id : " + jwtService.extractId(jwtToken));
             long user_id = jwtService.extractId(jwtToken);
+            int tokenVersion = jwtService.extactTokenversion(jwtToken);
 
 
 

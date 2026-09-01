@@ -58,6 +58,8 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
+    private int tokenVersion = 0;
+
 
 
 }

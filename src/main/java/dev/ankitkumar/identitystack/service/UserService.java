@@ -216,6 +216,8 @@ public class UserService {
         Set<Role> roles = user.getRoles();
         System.out.println("ROLES : " + roles);
 
+
+
         if (demotion) {
             if (roles.contains(Role.ADMIN)) {
                 if(id.equals(user.getId()))

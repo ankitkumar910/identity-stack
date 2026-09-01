@@ -40,4 +40,8 @@ public class CustomUserDetails implements UserDetails {
 
         return user.getId();
     }
+
+    public int getTokenVersion() {
+        return user.getTokenVersion();
+    }
 }
