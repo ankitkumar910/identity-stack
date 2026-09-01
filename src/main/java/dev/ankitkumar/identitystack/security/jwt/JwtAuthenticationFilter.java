@@ -1,5 +1,6 @@
 package dev.ankitkumar.identitystack.security.jwt;
 
+import dev.ankitkumar.identitystack.exception.JwtTokenException;
 import dev.ankitkumar.identitystack.security.CustomUserDetails;
 import dev.ankitkumar.identitystack.security.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
@@ -55,15 +56,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             System.out.println("User id : " + jwtService.extractId(jwtToken));
             long user_id = jwtService.extractId(jwtToken);
             int tokenVersion = jwtService.extactTokenversion(jwtToken);
+            CustomUserDetails customUserDetails = (CustomUserDetails) customUserDetailsService.loadUserByUserId(user_id);
+
+            if(customUserDetails == null) throw new RuntimeException("CustomUserDetails is null in JwtAuthenticationFilter.");
+            int tokenVersionFromDB = customUserDetails.getTokenVersion();
 
 
+            if(tokenVersion != tokenVersionFromDB) throw  new JwtTokenException("Token version mismatch! Please re-authenticate.");
 
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(customUserDetailsService.loadUserByUserId(user_id), null, jwtService.extractAuthorities(jwtToken));
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(customUserDetails, null, jwtService.extractAuthorities(jwtToken));
 
             if (authentication.isAuthenticated()) {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
+        } catch (JwtTokenException e) {
+
+
+            String message = """
+                    {
+                    message : ["%s"]
+                    }
+                    """.formatted(e.getLocalizedMessage());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write(message);
+            System.out.println("Exception in JwtFilterChain: "+e.getMessage());
+            return;
         } catch (RuntimeException e) {
 
 

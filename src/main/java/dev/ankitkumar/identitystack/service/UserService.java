@@ -15,6 +15,7 @@ import dev.ankitkumar.identitystack.exception.ParameterNotFoundException;
 import dev.ankitkumar.identitystack.exception.ResourceNotFoundException;
 import dev.ankitkumar.identitystack.mapper.UserMapper;
 import dev.ankitkumar.identitystack.repository.UserRepository;
+import dev.ankitkumar.identitystack.security.SecurityUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -215,20 +216,25 @@ public class UserService {
 
         Set<Role> roles = user.getRoles();
         System.out.println("ROLES : " + roles);
+        long myId = SecurityUtil.getUserId();
 
+        if (myId == id)
+            throw new AuthorizationDeniedException("You are not allowed to change your own role.");
 
 
         if (demotion) {
+
             if (roles.contains(Role.ADMIN)) {
-                if(id.equals(user.getId()))
-                roles.remove(Role.ADMIN);
-                else throw new AuthorizationDeniedException("You are not allowed to change your own role.");
+                    roles.remove(Role.ADMIN);
             } else {
-                throw new RuntimeException("Admin not found.");
+                throw new RuntimeException("Admin not found with id "+id + ".");
             }
-        } else {
+
+        }
+        else {
             roles.add(Role.ADMIN);
         }
-     return new RoleUpdateDto("Role updated successfully.");
+        user.setTokenVersion(user.getTokenVersion() + 1);
+        return new RoleUpdateDto("Role updated successfully.");
     }
 }
