@@ -7,9 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class IdentityStackApplication {
 
     public static void main(String[] args) {
-        System.out.println("Hey Ankit spring boot app started to run.");
+
         SpringApplication.run(IdentityStackApplication.class, args);
-        System.out.println("Hey Ankit spring boot app ran.");
+
     }
 
 }

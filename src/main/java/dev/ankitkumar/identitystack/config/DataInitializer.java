@@ -3,6 +3,7 @@ package dev.ankitkumar.identitystack.config;
 import dev.ankitkumar.identitystack.entity.Role;
 import dev.ankitkumar.identitystack.entity.User;
 import dev.ankitkumar.identitystack.repository.UserRepository;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,7 +27,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
+    public void run(String @NonNull ... args) {
 
 
         if (!userRepository.existsByRoles(Role.ADMIN)) {
@@ -44,7 +45,6 @@ public class DataInitializer implements CommandLineRunner {
                 user.setFirstName(firstName);
 
                 userRepository.save(user);
-                System.out.println("Admin created.");
             }
         }
     }

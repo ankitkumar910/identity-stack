@@ -8,13 +8,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 
 @Component
 @AllArgsConstructor
@@ -25,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
 
 
         String authenticationToken = request.getHeader("authorization");
@@ -33,15 +37,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
         if (authenticationToken == null || !authenticationToken.startsWith("Bearer ")) {
-            //System.out.println("Authentication token not found.");
             filterChain.doFilter(request, response);
-           // System.out.println("Returned.");
-
             return;
         }
 
         String jwtToken = authenticationToken.substring(7);
-        System.out.println("Jwt found.");
+
 
         if (jwtToken.isBlank()) {
             filterChain.doFilter(request, response);
@@ -53,9 +54,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
 
 
-            System.out.println("User id : " + jwtService.extractId(jwtToken));
+
             long user_id = jwtService.extractId(jwtToken);
-            int tokenVersion = jwtService.extactTokenversion(jwtToken);
+            int tokenVersion = jwtService.extractTokenVersion(jwtToken);
             CustomUserDetails customUserDetails = (CustomUserDetails) customUserDetailsService.loadUserByUserId(user_id);
 
             if(customUserDetails == null) throw new RuntimeException("CustomUserDetails is null in JwtAuthenticationFilter.");
@@ -64,8 +65,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if(tokenVersion != tokenVersionFromDB) throw  new JwtTokenException("Token version mismatch! Please re-authenticate.");
 
+            List<SimpleGrantedAuthority> authorities = jwtService.extractAuthorities(jwtToken);
 
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(customUserDetails, null, jwtService.extractAuthorities(jwtToken));
+            Objects.requireNonNull(authorities,"Authorities can't be null");
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(customUserDetails, null, authorities);
 
             if (authentication.isAuthenticated()) {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -81,7 +84,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     """.formatted(e.getLocalizedMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getWriter().write(message);
-            System.out.println("Exception in JwtFilterChain: "+e.getMessage());
             return;
         } catch (RuntimeException e) {
 
@@ -94,11 +96,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getWriter().write(message);
 
-            System.out.println("Exception in JwtFilterChain: "+e.getMessage());
             return;
         }
 
-        System.out.println("Run till here.");
         filterChain.doFilter(request, response);
 
     }
