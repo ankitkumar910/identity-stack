@@ -6,7 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -30,8 +30,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    @Value("${server.port}")
-    private String port;
+
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
@@ -61,20 +60,16 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new OncePerRequestFilter() {
                     @Override
-                    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+                    protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain chain)
                             throws ServletException, IOException, java.io.IOException {
                         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                        System.out.println("[DEBUG] Path: " + req.getRequestURI()
-                                + " | Auth class: " + (auth == null ? "null" : auth.getClass().getSimpleName())
-                                + " | Authorities: " + (auth == null ? "none" : auth.getAuthorities()));
                         chain.doFilter(req, res);
                     }
                 }, AuthorizationFilter.class)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) ->
                                 {
-                                    System.out.println("Error💻: " + authException.getMessage());
-                                    authException.printStackTrace();
+
                                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                                 }
 

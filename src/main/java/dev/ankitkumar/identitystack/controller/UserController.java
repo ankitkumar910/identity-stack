@@ -21,7 +21,7 @@ public class UserController {
     private UserService userService;
 
 
-    @PostMapping("")   //✅
+    @PostMapping("")
     private ResponseEntity<UserResponseDto> createUser(@RequestBody @Valid UserRegisterRequestDto userRequestDto) {
 
         UserResponseDto userResponseDto = userService.createUser(userRequestDto);
@@ -29,21 +29,21 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
     }
 
-    @GetMapping("/me") //✅
+    @GetMapping("/me")
     private ResponseEntity<UserResponseDto> findMyProfile() {
         String username = SecurityUtil.getUsername();
         UserResponseDto userResponseDto = userService.findUserByUsername(username);
         return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
     }
 
-    @PatchMapping("/me") //✅
+    @PatchMapping("/me")
     private ResponseEntity<UserResponseDto> updateUser(@RequestBody @Valid UserUpdateRequestDto requestDto) {
 
         long user_id = SecurityUtil.getUserId();
         return ResponseEntity.ok(userService.updateUser(requestDto, user_id));
     }
 
-    @PatchMapping("/me/password") //✅
+    @PatchMapping("/me/password")
     private ResponseEntity<UserPasswordUpdateResponse> updateUser(@RequestBody @Valid UserPasswordUpdate requestDto) {
 
         long user_id = SecurityUtil.getUserId();
@@ -51,7 +51,7 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/me") //✅
+    @DeleteMapping("/me")
     private ResponseEntity.BodyBuilder deleteUser() {
 
 

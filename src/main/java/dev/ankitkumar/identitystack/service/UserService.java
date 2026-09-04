@@ -81,8 +81,7 @@ public class UserService {
         }
 
         Pageable pageable = PageRequest.of(page, pageSize, sort);
-        // System.out.println("SORT = " + sort);
-        //System.out.println("PAGEABLE = " + pageable);
+
 
         if (search != null && !search.isBlank()) {
             userList = userRepository.searchAll(search, pageable).getContent();
@@ -99,8 +98,6 @@ public class UserService {
     }
 
     private boolean isSortedParameterValid(String sortedBy) {
-
-        // System.out.println("Called for : " + sortedBy);
 
         if (sortedBy == null) return true;
         if (sortedBy.isBlank()) return true;
@@ -215,7 +212,6 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id : " + id));
 
         Set<Role> roles = user.getRoles();
-        System.out.println("ROLES : " + roles);
         long myId = SecurityUtil.getUserId();
 
         if (myId == id)

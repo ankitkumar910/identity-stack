@@ -1,0 +1,34 @@
+services:
+  app:
+    build: .
+    image: identity-stack-app:latest
+    ports:
+      - "8080:8080"
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USERNAME:  ${DB_USERNAME}
+      DB_URL: "jdbc:mysql://mysql:3306/identitystack"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: on-failure
+
+
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+      MYSQL_DATABASE: "identitystack"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pankit@123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+
+volumes:
+  mysql_data:

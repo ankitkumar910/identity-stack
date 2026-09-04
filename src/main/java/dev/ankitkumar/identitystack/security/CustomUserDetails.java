@@ -2,7 +2,7 @@ package dev.ankitkumar.identitystack.security;
 
 import dev.ankitkumar.identitystack.entity.User;
 import lombok.AllArgsConstructor;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,19 +20,19 @@ public class CustomUserDetails implements UserDetails {
     private User user;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public @NonNull Collection<? extends GrantedAuthority> getAuthorities() {
 
         return user.getRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_"+role.name())).toList();
 
     }
 
     @Override
-    public @Nullable String getPassword() {
+    public @NonNull String getPassword() {
         return user.getPassword();
     }
 
     @Override
-    public String getUsername() {
+    public @NonNull String getUsername() {
         return user.getUsername();
     }
 

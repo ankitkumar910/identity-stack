@@ -18,7 +18,6 @@ public class AuthService {
 
     public String login(String username, String password) {
 
-        System.out.println("username : " + username + " , password : " + password);
 
         Authentication authRequest = new UsernamePasswordAuthenticationToken(username, password);
 
@@ -33,9 +32,7 @@ public class AuthService {
             throw  new RuntimeException("CustomUserDetails is null.");
 
         } catch (RuntimeException e) {
-            System.out.println("RuntimeException in AuthService.login() : " + e.getMessage());
             throw new InvalidCredentialException("Invalid username or password.");
-
         }
 
 
