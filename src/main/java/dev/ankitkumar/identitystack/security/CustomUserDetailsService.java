@@ -2,8 +2,8 @@ package dev.ankitkumar.identitystack.security;
 
 import dev.ankitkumar.identitystack.entity.User;
 import dev.ankitkumar.identitystack.repository.UserRepository;
-import dev.ankitkumar.identitystack.service.UserService;
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 
     @Override
-    public  CustomUserDetails loadUserByUsername(String username) {
+    public  @NonNull CustomUserDetails loadUserByUsername(@NonNull String username) {
 
 
 
