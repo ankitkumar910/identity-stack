@@ -223,7 +223,7 @@ public class UserService {
             if (roles.contains(Role.ADMIN)) {
                     roles.remove(Role.ADMIN);
             } else {
-                throw new RuntimeException("Admin not found with id "+id + ".");
+                throw new ResourceNotFoundException("Admin not found with id "+id + ".");
             }
 
         }
