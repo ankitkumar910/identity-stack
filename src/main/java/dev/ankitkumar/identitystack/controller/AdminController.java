@@ -39,7 +39,7 @@ public class AdminController {
     public ResponseEntity<UserResponseDto> findUserById(@PathVariable Long id) {
         UserResponseDto userResponseDto = userService.findUserById(id);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
     }
 
     @PatchMapping("/{id}")
@@ -51,10 +51,10 @@ public class AdminController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity.BodyBuilder deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
 
         userService.removeUserById(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/admin")

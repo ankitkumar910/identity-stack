@@ -66,7 +66,7 @@ public class UserMapper {
 
     }
 
-    private UserData getUserData(User user) {
+    public UserData getUserData(User user) {
 
         UserData userData = new UserData();
 

@@ -184,13 +184,14 @@ public class UserService {
     }
 
     @Transactional
-    public void removeUserById(Long id) {
+    public boolean removeUserById(Long id) {
 
         if(id < 0) throw  new IllegalArgumentException("user_id can't be negative.");
 
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
             SecurityContextHolder.getContext().setAuthentication(null);
+            return true;
         } else {
             throw new ResourceNotFoundException("No user found with id " + id);
         }

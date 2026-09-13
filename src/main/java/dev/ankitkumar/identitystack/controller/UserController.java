@@ -32,6 +32,7 @@ public class UserController {
     @GetMapping("/me")
     private ResponseEntity<UserResponseDto> findMyProfile() {
         String username = SecurityUtil.getUsername();
+       // System.out.println("Username.");
         UserResponseDto userResponseDto = userService.findUserByUsername(username);
         return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
     }
@@ -52,13 +53,13 @@ public class UserController {
 
 
     @DeleteMapping("/me")
-    private ResponseEntity.BodyBuilder deleteUser() {
+    private ResponseEntity<Void> deleteUser() {
 
 
         long user_id = SecurityUtil.getUserId();
 
-        userService.removeUserById(user_id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT);
+        boolean deleted = userService.removeUserById(user_id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
     }
 
