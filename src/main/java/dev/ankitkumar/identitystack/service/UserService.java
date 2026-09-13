@@ -48,9 +48,13 @@ public class UserService {
             throw new ConflictException("Email already present.");
         }
         if (userRequestDto.getPhone() != null && userRepository.existsByPhone(userRequestDto.getPhone())) {
+
             throw new ConflictException("Phone number already present.");
         }
         User user = userMapper.toUser(userRequestDto);
+
+
+        if (user == null) throw new ConflictException("User is null.");
         User userResponse = userRepository.save(user);
 
         return userMapper.toUserResponseDto(userResponse, HttpStatus.CREATED, "User registered successfully.");
@@ -68,26 +72,31 @@ public class UserService {
         if (!isValid)
             throw new ParameterNotFoundException("Sorting with parameter " + sortedBy + " is not supported.", whiteListField);
 
-        if (pageSize < 0) throw new ConflictException("Page size can't be less than 0. ");
-
 
         if (sortedBy != null && !sortedBy.isBlank()) {
             if (dir == null || dir.isBlank() || dir.equals("asc")) {
                 sort = Sort.by(Sort.Direction.ASC, sortedBy);
             } else if (dir.equals("desc")) {
                 sort = Sort.by(Sort.Direction.DESC, sortedBy);
+            } else {
+
+                throw new IllegalArgumentException("Invalid sorted direction. : " + dir);
             }
 
         }
 
+        if (pageSize <= 0 ) throw new IllegalArgumentException("Page size must be positive. ");
+        if (page < 0 ) throw new IllegalArgumentException("Page number can't be less than 0. ");
+
+
         Pageable pageable = PageRequest.of(page, pageSize, sort);
+
 
 
         if (search != null && !search.isBlank()) {
             userList = userRepository.searchAll(search, pageable).getContent();
         } else {
             userList = userRepository.findAll(pageable).getContent();
-
         }
 
         int userCount = userList.size();
@@ -97,7 +106,7 @@ public class UserService {
         return userMapper.toListUserResponseDto(userList, message, HttpStatus.OK);
     }
 
-    private boolean isSortedParameterValid(String sortedBy) {
+    public boolean isSortedParameterValid(String sortedBy) {
 
         if (sortedBy == null) return true;
         if (sortedBy.isBlank()) return true;
@@ -108,6 +117,8 @@ public class UserService {
 
     public UserResponseDto findUserById(Long id) {
 
+        if(id < 0) throw  new IllegalArgumentException("user_id can't be negative.");
+
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No User found with id " + id));
 
         return userMapper.toUserResponseDto(user, HttpStatus.OK, "User found.");
@@ -115,6 +126,7 @@ public class UserService {
 
     @Transactional
     public UserResponseDto updateUser(UserUpdateRequestDto requestDto, Long id) {
+        if(id < 0) throw  new IllegalArgumentException("user_id can't be negative.");
 
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No user found with id " + id));
 
@@ -139,7 +151,12 @@ public class UserService {
             updated = true;
         }
 
+
         if (shouldUpdateField(user.getPhone(), requestDto.getPhone())) {
+
+            if(userRepository.existsByPhone(requestDto.getPhone()))
+                throw new ConflictException("Phone is already present.");
+
             user.setPhone(requestDto.getPhone());
             updated = true;
         }
@@ -154,13 +171,13 @@ public class UserService {
 
             if (!userRepository.existsByUsername(requestDto.getUsername())) user.setUsername(requestDto.getUsername());
             else throw new ConflictException("Username already taken.");
+            updated = true;
 
         }
 
         if (updated) {
             user.setUpdatedAt(LocalDateTime.now());
             userRepository.save(user);
-
         }
 
         return userMapper.toUserResponseDto(user, HttpStatus.OK, "User updated successfully.");
@@ -168,6 +185,9 @@ public class UserService {
 
     @Transactional
     public void removeUserById(Long id) {
+
+        if(id < 0) throw  new IllegalArgumentException("user_id can't be negative.");
+
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
             SecurityContextHolder.getContext().setAuthentication(null);
@@ -179,37 +199,55 @@ public class UserService {
 
     public UserResponseDto findUserByUsername(String username) {
 
+        if(username == null || username.isBlank()) throw new IllegalArgumentException("username is invalid.");
+
         User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
         return userMapper.toUserResponseDto(user, HttpStatus.OK, "Success");
 
     }
 
-    boolean shouldUpdateField(String prevValue, String newValue) {
+    public boolean shouldUpdateField(String prevValue, String newValue) {
 
         return newValue != null && !newValue.isBlank() && !newValue.equals(prevValue);
     }
 
     @Transactional
     public UserPasswordUpdateResponse updateUserPassword(@Valid UserPasswordUpdate requestDto, long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found."));
+
+        if(userId < 0) throw  new IllegalArgumentException("user_id can't be negative.");
+        if(requestDto.getNewPassword() == null || requestDto.getNewPassword().isBlank()) throw  new IllegalArgumentException("Provide a valid updated password.");
+
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
         if (encoder.matches(requestDto.getOldPassword(), user.getPassword())) {
+
             user.setPassword(encoder.encode(requestDto.getNewPassword()));
             UserPasswordUpdateResponse passwordUpdateResponse = new UserPasswordUpdateResponse();
             passwordUpdateResponse.setMessage("Password updated.");
             user.setUpdatedAt(LocalDateTime.now());
             userRepository.save(user);
             return passwordUpdateResponse;
+
         }
 
         throw new BadCredentialsExceptions("Password does not matched with older one.");
     }
 
+
+    //need to write test cases for this methods; Do it after writing testing security layer.
     @Transactional
     public RoleUpdateDto updateRole(Long id, boolean demotion) {
 
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id : " + id));
+
+        if(id < 0) throw  new IllegalArgumentException("user_id can't be negative.");
+
+        User user = userRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id : " + id));
 
         Set<Role> roles = user.getRoles();
         long myId = SecurityUtil.getUserId();
@@ -221,13 +259,12 @@ public class UserService {
         if (demotion) {
 
             if (roles.contains(Role.ADMIN)) {
-                    roles.remove(Role.ADMIN);
+                roles.remove(Role.ADMIN);
             } else {
-                throw new ResourceNotFoundException("Admin not found with id "+id + ".");
+                throw new ResourceNotFoundException("Admin not found with id " + id + ".");
             }
 
-        }
-        else {
+        } else {
             roles.add(Role.ADMIN);
         }
         user.setTokenVersion(user.getTokenVersion() + 1);

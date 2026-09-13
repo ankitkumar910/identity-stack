@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,8 @@ public class UserMapper {
 
     private PasswordEncoder passwordEncoder;
 
-    public User toUser(UserRegisterRequestDto requestDto){
+    public User toUser(UserRegisterRequestDto requestDto) {
+
         User user = new User();
         user.setFirstName(requestDto.getFirstName());
         user.setLastName(requestDto.getLastName());
@@ -34,7 +36,7 @@ public class UserMapper {
         return user;
     }
 
-    public UserResponseDto toUserResponseDto(User user, HttpStatus statusCode, String message){
+    public UserResponseDto toUserResponseDto(User user, HttpStatus statusCode, String message) {
 
         UserData userData = getUserData(user);
 
@@ -47,19 +49,20 @@ public class UserMapper {
     }
 
     public ListUserResponseDto toListUserResponseDto(List<User> userList, String message, HttpStatus httpStatus) {
-        ListUserResponseDto listUserResponseDto  = new ListUserResponseDto();
+        ListUserResponseDto listUserResponseDto = new ListUserResponseDto();
 
         List<UserData> userDataList = new ArrayList<>();
-       for(User user : userList){
-           UserData userData = getUserData(user);
-           userDataList.add(userData);
-       }
 
-       listUserResponseDto.setData(userDataList);
-       listUserResponseDto.setMessage(message);
-       listUserResponseDto.setCode(httpStatus.value());
+        for (User user : userList) {
+            UserData userData = getUserData(user);
+            userDataList.add(userData);
+        }
 
-       return listUserResponseDto;
+        listUserResponseDto.setData(userDataList);
+        listUserResponseDto.setMessage(message);
+        listUserResponseDto.setCode(httpStatus.value());
+
+        return listUserResponseDto;
 
     }
 
@@ -75,6 +78,6 @@ public class UserMapper {
         userData.setPhone(user.getPhone());
 
 
-        return  userData;
+        return userData;
     }
 }

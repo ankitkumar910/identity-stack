@@ -22,6 +22,7 @@ public class SecurityUtil {
     public static long getUserId() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         if (authentication != null && authentication.isAuthenticated()) {
 
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();

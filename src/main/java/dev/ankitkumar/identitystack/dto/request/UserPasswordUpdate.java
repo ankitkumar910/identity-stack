@@ -13,7 +13,9 @@ import lombok.Setter;
 public class UserPasswordUpdate {
     @NotNull(message = "Old password is required.")
     private String oldPassword;
-    @NotNull(message = "New password is required.")
+
+
+
     @Pattern(
             regexp = ".*[a-z].*",
             message = "Password must contain at least one lowercase letter."

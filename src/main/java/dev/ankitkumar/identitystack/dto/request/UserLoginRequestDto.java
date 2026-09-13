@@ -12,10 +12,8 @@ import lombok.Setter;
 public class UserLoginRequestDto {
 
     @NotBlank(message = "Username can't be empty.")
-    @NotNull(message = "Username is required.")
     private String username;
 
     @NotBlank(message = "Password can't be empty.")
-    @NotNull(message = "Password is required.")
     private String password;
 }

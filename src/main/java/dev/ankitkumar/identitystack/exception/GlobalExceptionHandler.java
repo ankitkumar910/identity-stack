@@ -17,7 +17,8 @@ import java.util.Set;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ExceptionResponseDto> handleNotFoundException(ResourceNotFoundException exception) {
+    public ResponseEntity<ExceptionResponseDto> handleNotFoundException(ResourceNotFoundException exception)
+    {
 
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
         responseDto.getMessage().add(exception.getMessage());
@@ -27,7 +28,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<ExceptionResponseDto> handleConflictException(ConflictException exception) {
+    public ResponseEntity<ExceptionResponseDto> handleConflictException(ConflictException exception)
+    {
 
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
         responseDto.getMessage().add(exception.getMessage());
@@ -37,7 +39,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponseDto> handleValidationException(MethodArgumentNotValidException exception) {
+    public ResponseEntity<ExceptionResponseDto> handleValidationException(MethodArgumentNotValidException exception)
+    {
 
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
         responseDto.setStatus(HttpStatus.BAD_REQUEST);
@@ -55,7 +58,8 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(ParameterNotFoundException.class)
-    public ResponseEntity<ExceptionResponseDto> handleParameterNotFoundException(ParameterNotFoundException exception) {
+    public ResponseEntity<ExceptionResponseDto> handleParameterNotFoundException(ParameterNotFoundException exception)
+    {
 
 
         StringBuilder sBuilder = new StringBuilder(exception.getMessage());
@@ -81,7 +85,8 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(InvalidCredentialException.class)
-    public ResponseEntity<ExceptionResponseDto> handleInvalidCredentialsException(InvalidCredentialException exception) {
+    public ResponseEntity<ExceptionResponseDto> handleInvalidCredentialsException(InvalidCredentialException exception)
+    {
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
 
 
@@ -93,7 +98,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ExceptionResponseDto> handleGeneralException(RuntimeException exception) {
+    public ResponseEntity<ExceptionResponseDto> handleGeneralException(RuntimeException exception)
+    {
 
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
 
@@ -106,7 +112,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(JwtTokenException.class)
-    public ResponseEntity<ExceptionResponseDto> handleJwtException(JwtTokenException exception) {
+    public ResponseEntity<ExceptionResponseDto> handleJwtException(JwtTokenException exception)
+    {
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
 
 
@@ -119,7 +126,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<ExceptionResponseDto> handleAccessDeniedException(AuthorizationDeniedException exception) {
+    public ResponseEntity<ExceptionResponseDto> handleAccessDeniedException(AuthorizationDeniedException exception)
+    {
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
 
 
@@ -133,7 +141,8 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ExceptionResponseDto> handleHttpMessageNotReadable() {
+    public ResponseEntity<ExceptionResponseDto> handleHttpMessageNotReadable()
+    {
 
         ExceptionResponseDto responseDto = new ExceptionResponseDto();
 
@@ -146,7 +155,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ExceptionResponseDto> handleDataIntegrityViolation() {
+    public ResponseEntity<ExceptionResponseDto> handleDataIntegrityViolation()
+    {
 
         ExceptionResponseDto response = new ExceptionResponseDto();
 
@@ -159,7 +169,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsExceptions.class)
-    public ResponseEntity<ExceptionResponseDto> handleBadCredentialsException() {
+    public ResponseEntity<ExceptionResponseDto> handleBadCredentialsException()
+    {
 
         ExceptionResponseDto response = new ExceptionResponseDto();
 

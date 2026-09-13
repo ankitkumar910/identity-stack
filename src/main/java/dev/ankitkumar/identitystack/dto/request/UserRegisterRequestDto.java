@@ -11,7 +11,6 @@ import lombok.Setter;
 public class UserRegisterRequestDto {
 
     @NotBlank(message = "first name is required.")
-    @NotNull(message = "first name can not be null.")
     @Pattern(regexp = "^[a-zA-Z]+$",message = "first name can only contain alphabets.")
     @Size(min = 2,max = 50, message = "first name can't be grater than 50 characters and less than 2 characters.")
     private String firstName;
