@@ -4,30 +4,35 @@ A minimal Spring Boot service providing user management with CRUD operations, se
 
 ## Table of Contents
 
-- [Identity Stack](#identity-stack)
-  - [Table of Contents](#table-of-contents)
-  - [Tech Stack](#tech-stack)
-  - [Architecture](#architecture)
-  - [Quick Start](#quick-start)
-    - [Option A: Run Locally](#option-a-run-locally)
-    - [Option B: Run with Docker](#option-b-run-with-docker)
-  - [API Reference](#api-reference)
-    - [Authentication](#authentication)
-    - [Users](#users)
-    - [Admin](#admin)
-  - [Access Control](#access-control)
-  - [Anonymous User Workflow](#anonymous-user-workflow)
-  - [Authentication \& Security](#authentication--security)
-  - [Search, Pagination \& Sorting](#search-pagination--sorting)
-  - [Configuration](#configuration)
-    - [Database](#database)
-    - [Admin Bootstrapping](#admin-bootstrapping)
-  - [Docker Services](#docker-services)
-    - [Environment Variables](#environment-variables)
-  - [Error Responses](#error-responses)
-  - [Files of Interest](#files-of-interest)
-  - [Contribute](#contribute)
+* [Identity Stack](#identity-stack)
 
+  * [Table of Contents](#table-of-contents)
+  * [Tech Stack](#tech-stack)
+  * [Architecture](#architecture)
+  * [Quick Start](#quick-start)
+
+    * [Option A: Run Locally](#option-a-run-locally)
+    * [Option B: Run with Docker](#option-b-run-with-docker)
+  * [API Reference](#api-reference)
+
+    * [Authentication](#authentication)
+    * [Users](#users)
+    * [Admin](#admin)
+  * [Access Control](#access-control)
+  * [Anonymous User Workflow](#anonymous-user-workflow)
+  * [Authentication & Security](#authentication--security)
+  * [Testing](#testing)
+  * [Search, Pagination & Sorting](#search-pagination--sorting)
+  * [Configuration](#configuration)
+
+    * [Database](#database)
+    * [Admin Bootstrapping](#admin-bootstrapping)
+  * [Docker Services](#docker-services)
+
+    * [Environment Variables](#environment-variables)
+  * [Error Responses](#error-responses)
+  * [Files of Interest](#files-of-interest)
+  * [Contribute](#contribute)
 
 ## Tech Stack
 
@@ -38,8 +43,6 @@ A minimal Spring Boot service providing user management with CRUD operations, se
 * **ORM:** Spring Data JPA (Hibernate)
 * **Build Tool:** Maven
 * **Containerization:** Docker, Docker Compose
-  
-
 
 ## Architecture
 
@@ -54,9 +57,6 @@ flowchart TD
   Service -->|maps| Mapper["UserMapper"]
   Controller -.->|errors| Handler["GlobalExceptionHandler"]
 ```
-
-
-
 
 ## Quick Start
 
@@ -179,7 +179,37 @@ The application uses stateless JWT-based authentication with Spring Security.
 * An initial admin user can be created automatically through `DataInitializer` when no admin user exists.
 * Admin credentials can be configured using `application.admin.username`, `application.admin.password`, and `application.admin.first-name`. These should be provided securely in production rather than committed to source control.
 
+## Testing
 
+The project includes automated tests for the mapper, repository, service, controller, and security layers.
+
+### Security Test Cases
+
+The security package tests cover user identity mapping, role conversion, JWT generation, claim extraction, and invalid token handling.
+
+#### CustomUserDetailsTest
+
+* **SEC-001 — User identity and password:** Verifies that `CustomUserDetails` correctly exposes the username, password, and user ID from the wrapped `User` entity.
+* **SEC-002 — Role to authority mapping:** Verifies that user roles are converted to Spring Security authorities such as `ROLE_USER` and `ROLE_ADMIN`.
+* **SEC-003 — Account state flags:** Verifies that `isAccountNonExpired()`, `isAccountNonLocked()`, `isCredentialsNonExpired()`, and `isEnabled()` return `true`.
+
+#### JwtServiceTest
+
+* **SEC-004 — JWT generation:** Verifies that a JWT is generated successfully with the expected user information and can be parsed without errors.
+* **SEC-005 — User ID extraction:** Verifies that the `user_id` claim is extracted correctly from the JWT.
+* **SEC-006 — Token version extraction:** Verifies that the token version claim is preserved and extracted correctly.
+* **SEC-007 — Authority extraction:** Verifies that roles stored in the JWT are converted back into `SimpleGrantedAuthority` objects.
+* **SEC-008 — Invalid JWT handling:** Verifies that malformed or invalid JWT strings result in `JwtTokenException`.
+* **SEC-009 — Tampered or malformed token handling:** Verifies that broken, expired, or tampered tokens are rejected without silent fallback or empty values.
+
+### Test Coverage Areas
+
+* User identity and password mapping
+* Security role conversion
+* JWT generation
+* JWT claim extraction
+* Invalid and malformed token handling
+* Security exception behavior
 
 ## Search, Pagination & Sorting
 
@@ -235,19 +265,17 @@ The application is containerized using Docker and orchestrated with Docker Compo
 * **app** — builds the Spring Boot application from the local `Dockerfile` and exposes it on port `8080`. It depends on the `mysql` service being healthy before starting.
 * **mysql** — runs a MySQL container, initializes the `identitystack` database, and persists data using a named volume (`mysql_data`).
 
-
 ### Environment Variables
 
 Database credentials are not hardcoded and are supplied through environment variables at runtime:
 
-| Variable              | Description                          |
-| ---------------------- | ------------------------------------ |
-| `DB_USERNAME`          | Username for the application database connection |
-| `DB_PASSWORD`          | Password for the application database connection |
-| `MYSQL_ROOT_PASSWORD`  | Root password for the MySQL container |
+| Variable              | Description                                      |
+| --------------------- | ------------------------------------------------ |
+| `DB_USERNAME`         | Username for the application database connection |
+| `DB_PASSWORD`         | Password for the application database connection |
+| `MYSQL_ROOT_PASSWORD` | Root password for the MySQL container            |
 
 These values are defined in a local `.env` file, which is excluded from version control via `.gitignore`. An `.env.example` file is provided as a reference template for required variables.
-
 
 ## Error Responses
 
@@ -271,8 +299,6 @@ See `GlobalExceptionHandler` and the security exception handling for implementat
 * `security/**`
 * `config/SecurityConfig.java`
 * `DataInitializer`
-
-
 
 ## Contribute
 
