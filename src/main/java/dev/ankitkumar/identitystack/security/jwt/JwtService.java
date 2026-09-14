@@ -18,6 +18,7 @@ import java.util.List;
 
 @Service
 public class JwtService {
+
     private static final SecretKey key = Jwts.SIG.HS256.key().build();
     @Value("${jwt.token.duration}")
     private long duration;
