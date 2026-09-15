@@ -8,6 +8,9 @@ import dev.ankitkumar.identitystack.dto.response.UserResponseDto;
 import dev.ankitkumar.identitystack.entity.Role;
 import dev.ankitkumar.identitystack.entity.User;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -15,13 +18,18 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Component
 @AllArgsConstructor
+@Slf4j
 public class UserMapper {
 
     private PasswordEncoder passwordEncoder;
 
+
+
     public User toUser(UserRegisterRequestDto requestDto) {
+
 
         User user = new User();
         user.setFirstName(requestDto.getFirstName());
@@ -32,6 +40,7 @@ public class UserMapper {
         user.setUsername(requestDto.getUsername());
         user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         user.getRoles().add(Role.USER);
+
 
         return user;
     }

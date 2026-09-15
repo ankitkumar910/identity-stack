@@ -8,7 +8,8 @@ public class IdentityStackApplication {
 
     public static void main(String[] args) {
 
-        SpringApplication.run(IdentityStackApplication.class, args);
+
+      SpringApplication.run(IdentityStackApplication.class, args);
 
     }
 
