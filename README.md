@@ -22,14 +22,15 @@ A minimal Spring Boot service providing user management with CRUD operations, se
   * [Anonymous User Workflow](#anonymous-user-workflow)
   * [Authentication & Security](#authentication--security)
   * [Testing](#testing)
+  * [Logging](#logging)
   * [Search, Pagination & Sorting](#search-pagination--sorting)
   * [Configuration](#configuration)
 
-    * [Database](#database)
-    * [Admin Bootstrapping](#admin-bootstrapping)
+   * [Database](#database)
+   * [Admin Bootstrapping](#admin-bootstrapping)
   * [Docker Services](#docker-services)
 
-    * [Environment Variables](#environment-variables)
+   * [Environment Variables](#environment-variables)
   * [Error Responses](#error-responses)
   * [Files of Interest](#files-of-interest)
   * [Contribute](#contribute)
@@ -210,6 +211,30 @@ The security package tests cover user identity mapping, role conversion, JWT gen
 * JWT claim extraction
 * Invalid and malformed token handling
 * Security exception behavior
+
+
+
+## Logging
+
+The application uses Spring Boot’s default logging stack: SLF4J + Logback, with Lombok’s `@Slf4j` annotation used to inject logger instances across services and security components.
+
+Logging is implemented in key operational flows to make the application easier to debug and monitor:
+
+* **AuthService** logs login attempts and successful authentication events.
+* **UserService** logs user creation, lookup, updates, deletion, password changes, and role operations.
+* **JwtAuthenticationFilter** logs invalid or missing tokens and JWT authentication failures.
+* **GlobalExceptionHandler** logs relevant authorization, authentication, JWT, and unexpected application errors.
+
+Log levels are used intentionally:
+
+* **INFO** for normal business actions such as login, user registration, fetches, and successful updates.
+* **WARN** for expected but problematic scenarios such as invalid credentials, malformed tokens, and forbidden access.
+* **ERROR** for unexpected failures that require investigation.
+
+This keeps runtime behavior observable without exposing sensitive data. The project currently relies on Spring Boot’s default console-based logging configuration; there is no custom `logback.xml` or dedicated file appender in the repository.
+
+
+
 
 ## Search, Pagination & Sorting
 
