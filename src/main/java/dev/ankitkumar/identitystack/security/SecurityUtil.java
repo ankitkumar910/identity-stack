@@ -10,8 +10,6 @@ public class SecurityUtil {
 
     public static String getUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-      //  System.out.println("Called Here");
         if (authentication != null && authentication.isAuthenticated()) {
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
             if (customUserDetails != null) return customUserDetails.getUsername();

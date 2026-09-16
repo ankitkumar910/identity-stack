@@ -3,12 +3,14 @@ package dev.ankitkumar.identitystack.config;
 import dev.ankitkumar.identitystack.entity.Role;
 import dev.ankitkumar.identitystack.entity.User;
 import dev.ankitkumar.identitystack.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class DataInitializer implements CommandLineRunner {
 
@@ -31,21 +33,25 @@ public class DataInitializer implements CommandLineRunner {
 
 
         if (!userRepository.existsByRoles(Role.ADMIN)) {
-            {
-                if (adminUsername == null || adminUsername.isBlank())
-                    throw new RuntimeException("Admin username is required.");
-                if (adminPassword == null || adminPassword.isBlank())
-                    throw new RuntimeException("Admin password is required.");
 
-                User user = new User();
-                user.setUsername(adminUsername);
-                user.setPassword(passwordEncoder.encode(adminPassword));
-                user.getRoles().add(Role.ADMIN);
-                user.getRoles().add(Role.USER);
-                user.setFirstName(firstName);
 
-                userRepository.save(user);
-            }
+            if (adminUsername == null || adminUsername.isBlank())
+                throw new RuntimeException("Admin username is required.");
+            if (adminPassword == null || adminPassword.isBlank())
+                throw new RuntimeException("Admin password is required.");
+
+            User user = new User();
+            user.setUsername(adminUsername);
+            user.setPassword(passwordEncoder.encode(adminPassword));
+            user.getRoles().add(Role.ADMIN);
+            user.getRoles().add(Role.USER);
+            user.setFirstName(firstName);
+
+            userRepository.save(user);
+            log.info("Bootstrap Admin created.");
+
+        } else {
+            log.info("Bootstrap Admin is already present.");
         }
     }
 

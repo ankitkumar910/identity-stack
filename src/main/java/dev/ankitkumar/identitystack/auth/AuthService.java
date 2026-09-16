@@ -4,11 +4,13 @@ import dev.ankitkumar.identitystack.exception.InvalidCredentialException;
 import dev.ankitkumar.identitystack.security.CustomUserDetails;
 import dev.ankitkumar.identitystack.security.jwt.JwtService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class AuthService {
@@ -18,6 +20,7 @@ public class AuthService {
 
     public String login(String username, String password) {
 
+        log.info("Login user: username = {} ",username);
 
         Authentication authRequest = new UsernamePasswordAuthenticationToken(username, password);
 
@@ -27,7 +30,10 @@ public class AuthService {
             Authentication authResponse = authenticationManager.authenticate(authRequest);
             CustomUserDetails customUserDetails = (CustomUserDetails) authResponse.getPrincipal();
 
-            if(customUserDetails != null)  return jwtService.getToken(customUserDetails);
+            if(customUserDetails != null){
+                log.info("User logged in successfully: username = {} ",username);
+                return jwtService.getToken(customUserDetails);
+            }
 
             throw  new RuntimeException("CustomUserDetails is null.");
 
