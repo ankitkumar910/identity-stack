@@ -1,4 +1,4 @@
-# Identity Stack
+# <img width="28" height="28" alt="identity-stack-logo" src="https://github.com/user-attachments/assets/81a08536-91db-4399-b469-89606dd42a06" /> Identity Stack
 
 A minimal Spring Boot service providing user management with CRUD operations, search, pagination, validation, JWT-based authentication, token invalidation, and role-based access control.
 
